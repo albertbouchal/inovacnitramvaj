@@ -10,17 +10,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0d0f10;
-      --surface:  #151819;
-      --border:   #242829;
-      --muted:    #3a3f42;
-      --text:     #c8ced1;
-      --dim:      #6b7478;
-      --accent:   #e8c840;   /* PID yellow */
-      --green:    #4fc38a;
-      --red:      #e05a4e;
-      --mono:     'Space Mono', monospace;
-      --sans:     'Barlow Condensed', sans-serif;
+      --bg:      #0d0f10;
+      --surface: #151819;
+      --border:  #242829;
+      --muted:   #3a3f42;
+      --text:    #c8ced1;
+      --dim:     #6b7478;
+      --accent:  #e8c840;
+      --green:   #4fc38a;
+      --red:     #e05a4e;
+      --mono:    'Space Mono', monospace;
+      --sans:    'Barlow Condensed', sans-serif;
     }
 
     body {
@@ -33,7 +33,6 @@
       flex-direction: column;
     }
 
-    /* ── Header ── */
     header {
       border-bottom: 1px solid var(--border);
       padding: 18px 28px;
@@ -65,15 +64,11 @@
       background: var(--green);
       display: inline-block;
       margin-right: 6px;
-      animation: pulse 2s infinite;
+      animation: blink 2s infinite;
     }
     .pulse.offline { background: var(--red); animation: none; }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.3; }
-    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-    /* ── Main layout ── */
     main {
       flex: 1;
       padding: 28px;
@@ -83,7 +78,6 @@
       max-width: 760px;
     }
 
-    /* ── Config bar ── */
     .config {
       display: flex;
       align-items: center;
@@ -109,13 +103,6 @@
     }
     input:focus { border-color: var(--accent); }
 
-    /* API key input */
-    #apiKeyInput {
-      width: 340px;
-      font-size: 12px;
-      letter-spacing: 0.03em;
-    }
-
     .btn {
       background: var(--accent);
       color: #0d0f10;
@@ -138,13 +125,11 @@
     }
     .btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* ── Status card ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       padding: 24px 28px;
     }
-
     .card-label {
       font-family: var(--sans);
       font-size: 11px;
@@ -164,13 +149,10 @@
       background: var(--border);
     }
 
-    /* ── Vehicle info ── */
     .vehicle-status {
       display: grid;
       grid-template-columns: auto 1fr;
-      gap: 0;
     }
-
     .line-badge {
       font-family: var(--sans);
       font-weight: 700;
@@ -185,23 +167,13 @@
       min-width: 120px;
       justify-content: center;
     }
-    .line-badge.empty {
-      font-size: 32px;
-      color: var(--muted);
-    }
-
     .vehicle-details {
       display: flex;
       flex-direction: column;
       gap: 12px;
       justify-content: center;
     }
-
-    .detail-row {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    .detail-row { display: flex; flex-direction: column; gap: 2px; }
     .detail-key {
       font-size: 10px;
       color: var(--dim);
@@ -218,7 +190,6 @@
     .detail-val.accent { color: var(--accent); }
     .detail-val.muted  { color: var(--muted); font-size: 16px; }
 
-    /* ── State messages ── */
     .state-msg {
       padding: 32px 0;
       text-align: center;
@@ -228,25 +199,23 @@
     }
     .state-msg.error { color: var(--red); }
 
-    /* ── Log ── */
     .log {
       font-size: 11px;
       color: var(--dim);
       border-top: 1px solid var(--border);
       margin-top: 20px;
       padding-top: 14px;
-      max-height: 120px;
+      max-height: 140px;
       overflow-y: auto;
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: column;
       gap: 3px;
     }
-    .log-entry { letter-spacing: 0.03em; }
+    .log-entry { letter-spacing: 0.03em; font-family: var(--mono); }
     .log-entry.ok   { color: var(--green); }
     .log-entry.err  { color: var(--red); }
     .log-entry.warn { color: var(--accent); }
 
-    /* ── Footer ── */
     footer {
       border-top: 1px solid var(--border);
       padding: 12px 28px;
@@ -261,30 +230,17 @@
     footer a { color: var(--dim); text-decoration: none; }
     footer a:hover { color: var(--accent); }
 
-    /* ── Responsive ── */
     @media (max-width: 520px) {
       .vehicle-status { grid-template-columns: 1fr; }
       .line-badge {
         font-size: 48px;
         border-right: none;
         border-bottom: 1px solid var(--border);
-        padding-right: 0;
-        padding-bottom: 16px;
-        margin-right: 0;
-        margin-bottom: 16px;
+        padding-right: 0; padding-bottom: 16px;
+        margin-right: 0; margin-bottom: 16px;
         min-width: unset;
       }
-      #apiKeyInput { width: 100%; }
     }
-
-    /* ── API key setup section ── */
-    #setupSection {
-      display: none;
-    }
-    #setupSection.visible { display: block; }
-
-    /* separator */
-    .sep { color: var(--border); }
   </style>
 </head>
 <body>
@@ -292,118 +248,107 @@
 <header>
   <div class="logo">PID <span>/</span> Tram Tracker</div>
   <div class="header-meta">
-    <span class="pulse" id="statusDot"></span>
+    <span class="pulse offline" id="statusDot"></span>
     <span id="statusText">Idle</span>
   </div>
-  <div style="font-size:11px; color:var(--dim); letter-spacing:0.05em;">
+  <div style="font-size:11px;color:var(--dim);letter-spacing:0.05em;">
     Updated: <span id="lastUpdated">—</span>
   </div>
 </header>
 
 <main>
 
-  <!-- Config row -->
   <div class="config">
     <label for="carInput">Car №</label>
     <input type="text" id="carInput" value="9277" maxlength="6" />
 
-    <label for="intervalInput">Refresh (s)</label>
+    <label for="intervalInput" style="margin-left:8px;">Refresh (s)</label>
     <input type="number" id="intervalInput" value="20" min="10" max="120" style="width:72px;" />
 
-    <button class="btn" id="startBtn" onclick="startTracking()">Track</button>
+    <button class="btn" onclick="startTracking()">Track</button>
     <button class="btn secondary" onclick="stopTracking()">Stop</button>
-    <button class="btn secondary" onclick="toggleSetup()">API Key</button>
   </div>
 
-  <!-- API key setup -->
-  <div id="setupSection">
-    <div class="config" style="margin-top:0;">
-      <label for="apiKeyInput">Golemio API Key</label>
-      <input type="text" id="apiKeyInput" placeholder="Paste your key here…" />
-      <button class="btn" onclick="saveKey()">Save</button>
-    </div>
-    <div style="font-size:11px; color:var(--dim); margin-top:8px; letter-spacing:0.04em;">
-      Register free at <a href="https://api.golemio.cz/api-keys" target="_blank" style="color:var(--accent);">api.golemio.cz/api-keys</a>.
-      The key is stored only in this file (hardcoded) — never sent anywhere except Golemio's API.
+  <!-- IMPORTANT SETUP NOTE -->
+  <div id="workerWarning" class="card" style="border-color:#e8c84044;">
+    <div style="font-family:var(--sans);font-size:13px;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">⚙ Setup required</div>
+    <div style="font-size:12px;color:var(--dim);line-height:1.7;">
+      Replace <code style="color:var(--accent);background:#0d0f10;padding:1px 6px;">YOUR_WORKER_URL</code> in this file with your Cloudflare Worker URL before deploying.<br/>
+      See the included <strong style="color:var(--text);">README.md</strong> for step-by-step instructions.
     </div>
   </div>
 
-  <!-- Main status card -->
   <div class="card">
     <div class="card-label">Vehicle Status — Car <span id="cardCarNum">9277</span></div>
 
-    <div id="vehiclePanel">
-      <div class="state-msg" id="idleMsg">Press <strong style="color:var(--accent)">Track</strong> to start monitoring.</div>
+    <div class="state-msg" id="idleMsg">Press <strong style="color:var(--accent)">Track</strong> to start monitoring.</div>
 
-      <div class="vehicle-status" id="vehicleInfo" style="display:none;">
-        <div class="line-badge" id="lineBadge">—</div>
-        <div class="vehicle-details">
-          <div class="detail-row">
-            <div class="detail-key">Direction</div>
-            <div class="detail-val accent" id="headsign">—</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-key">Last stop</div>
-            <div class="detail-val" id="lastStop">—</div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-key">Status</div>
-            <div class="detail-val muted" id="tripStatus">—</div>
-          </div>
+    <div class="vehicle-status" id="vehicleInfo" style="display:none;">
+      <div class="line-badge" id="lineBadge">—</div>
+      <div class="vehicle-details">
+        <div class="detail-row">
+          <div class="detail-key">Direction</div>
+          <div class="detail-val accent" id="headsign">—</div>
         </div>
-      </div>
-
-      <div class="state-msg error" id="errorMsg" style="display:none;"></div>
-      <div class="state-msg" id="notFoundMsg" style="display:none;">
-        Car <strong id="notFoundNum" style="color:var(--accent);"></strong> not found in active feed.
-        It may be in depot or off service.
+        <div class="detail-row">
+          <div class="detail-key">Last stop</div>
+          <div class="detail-val" id="lastStop">—</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">Status</div>
+          <div class="detail-val muted" id="tripStatus">—</div>
+        </div>
       </div>
     </div>
 
-    <!-- Log -->
+    <div class="state-msg error" id="errorMsg" style="display:none;"></div>
+
+    <div class="state-msg" id="notFoundMsg" style="display:none;">
+      Car <strong id="notFoundNum" style="color:var(--accent);"></strong> not found in active feed —
+      possibly in depot or off service right now.
+    </div>
+
     <div class="log" id="logBox"></div>
   </div>
 
 </main>
 
 <footer>
-  <span>Data: <a href="https://api.golemio.cz" target="_blank">Golemio / Operator ICT</a> &nbsp;·&nbsp; PID Prague</span>
+  <span>Data: <a href="https://api.golemio.cz" target="_blank">Golemio / Operator ICT</a> · PID Prague</span>
   <span id="footerCar">Car 9277</span>
 </footer>
 
 <script>
-  // ── CONFIG ──────────────────────────────────────────────────────────────
-  // Paste your Golemio API key between the quotes below after you register:
-  const HARDCODED_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEwNSwiaWF0IjoxNzc0ODU3NDMyLCJleHAiOjExNzc0ODU3NDMyLCJpc3MiOiJnb2xlbWlvIiwianRpIjoiNDdkY2M2ZGQtYjI0Mi00YTE3LWFiNWEtOWQ1Y2ZkYWM4NDZkIn0.o7neuc-TmOGEVAj7AynmzGy7t1VDC0MlNB4yQfmDl4E';
-
-  // Endpoint
-  const BASE_URL = 'https://api.golemio.cz/v2/vehiclepositions';
+  // ── CONFIGURATION ────────────────────────────────────────────────────────
+  // After deploying your Cloudflare Worker, replace the URL below with yours.
+  // It will look like: https://pid-proxy.YOUR-SUBDOMAIN.workers.dev
+  const WORKER_URL = 'YOUR_WORKER_URL';
 
   // ── STATE ────────────────────────────────────────────────────────────────
   let trackInterval = null;
-  let currentCar = '9277';
 
-  // ── UI helpers ───────────────────────────────────────────────────────────
+  // ── HELPERS ──────────────────────────────────────────────────────────────
   function log(msg, type = '') {
     const box = document.getElementById('logBox');
     const d = document.createElement('div');
     d.className = 'log-entry' + (type ? ' ' + type : '');
-    const t = new Date().toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const t = new Date().toLocaleTimeString('cs-CZ', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
     d.textContent = `${t}  ${msg}`;
-    box.prepend(d);
-    if (box.children.length > 40) box.removeChild(box.lastChild);
+    box.insertBefore(d, box.firstChild);
+    if (box.children.length > 50) box.removeChild(box.lastChild);
   }
 
   function setStatus(online, text) {
-    const dot = document.getElementById('statusDot');
-    dot.className = 'pulse' + (online ? '' : ' offline');
+    document.getElementById('statusDot').className = 'pulse' + (online ? '' : ' offline');
     document.getElementById('statusText').textContent = text;
   }
 
   function showPanel(which, extra) {
-    ['idleMsg','vehicleInfo','errorMsg','notFoundMsg'].forEach(id => {
-      document.getElementById(id).style.display = 'none';
-    });
+    document.getElementById('idleMsg').style.display     = 'none';
+    document.getElementById('vehicleInfo').style.display = 'none';
+    document.getElementById('errorMsg').style.display    = 'none';
+    document.getElementById('notFoundMsg').style.display = 'none';
+
     if (which === 'vehicle') {
       document.getElementById('vehicleInfo').style.display = 'grid';
     } else if (which === 'error') {
@@ -418,59 +363,27 @@
     }
   }
 
-  function getApiKey() {
-    // Use hardcoded key, or fallback to sessionStorage (set via UI)
-    return HARDCODED_API_KEY || sessionStorage.getItem('golemio_key') || '';
-  }
-
-  function saveKey() {
-    const k = document.getElementById('apiKeyInput').value.trim();
-    if (!k) return;
-    sessionStorage.setItem('golemio_key', k);
-    log('API key saved for this session.', 'ok');
-    toggleSetup();
-  }
-
-  function toggleSetup() {
-    const s = document.getElementById('setupSection');
-    s.classList.toggle('visible');
-  }
-
-  // ── Fetch & parse ────────────────────────────────────────────────────────
+  // ── MAIN FETCH ───────────────────────────────────────────────────────────
   async function fetchVehicles() {
-    const key = getApiKey();
-    if (!key) {
-      showPanel('error', 'No API key set. Click "API Key" to enter your Golemio key.');
-      setStatus(false, 'No key');
+    const car = document.getElementById('carInput').value.trim();
+    document.getElementById('cardCarNum').textContent = car;
+    document.getElementById('footerCar').textContent  = 'Car ' + car;
+
+    if (WORKER_URL === 'YOUR_WORKER_URL') {
+      showPanel('error', 'Worker URL not set. Edit index.html and replace YOUR_WORKER_URL.');
+      setStatus(false, 'Not configured');
       return;
     }
-
-    const car = document.getElementById('carInput').value.trim();
-    currentCar = car;
-    document.getElementById('cardCarNum').textContent = car;
-    document.getElementById('footerCar').textContent = 'Car ' + car;
-    document.getElementById('notFoundNum').textContent = car;
 
     setStatus(true, 'Fetching…');
 
     let data;
     try {
-      // Fetch trams (routeType=0 in GTFS = trams)
-      // We fetch all trams and filter client-side by car number.
-      // The Golemio vehiclepositions endpoint supports ?routeType=1 (trams in PID enumeration)
-      // We also try without filter as a fallback.
-      const res = await fetch(`${BASE_URL}?routeType=1&limit=500&includeNotTracking=false`, {
-        headers: {
-          'X-Access-Token': key,
-          'Accept': 'application/json'
-        }
-      });
-
+      const res = await fetch(WORKER_URL);
       if (!res.ok) {
         const errText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errText.slice(0, 120)}`);
+        throw new Error(`HTTP ${res.status}: ${errText.slice(0, 200)}`);
       }
-
       data = await res.json();
     } catch (err) {
       log('Fetch error: ' + err.message, 'err');
@@ -479,74 +392,78 @@
       return;
     }
 
-    const now = new Date().toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const now = new Date().toLocaleTimeString('cs-CZ', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
     document.getElementById('lastUpdated').textContent = now;
 
-    // Parse GeoJSON FeatureCollection
     const features = data.features || [];
-    log(`Received ${features.length} tram positions.`, 'ok');
+    log(`Received ${features.length} vehicle positions.`, 'ok');
 
-    // Search for our car across all possible ID fields
+    // Debug: on first successful fetch, log property structure of first vehicle
+    if (features.length > 0 && !window._debugDone) {
+      window._debugDone = true;
+      const s = features[0].properties || {};
+      log('Fields: ' + JSON.stringify(Object.keys(s)), '');
+      if (s.trip) log('Trip fields: ' + JSON.stringify(Object.keys(s.trip)), '');
+      log('Sample: ' + JSON.stringify(s).slice(0, 500), '');
+    }
+
+    // Find our vehicle — try every known field name for car registration number
     const match = features.find(f => {
-      const p = f.properties || {};
+      const p    = f.properties || {};
       const trip = p.trip || {};
+      const cis  = p.cis  || {};
 
-      // Try all known field names for vehicle car number
       const candidates = [
-        String(p.vehicle_registration_number ?? ''),
-        String(p.cis?.vehicle_registration_number ?? ''),
-        String(trip.vehicle_registration_number ?? ''),
-        String(p.vehicle?.registration_number ?? ''),
-        String(p.kv_cislo ?? ''),
-        // The Golemio v2 schema uses properties.trip.vehicle_registration_number
-        String(trip.cis_vehicle_id ?? ''),
-        String(p.cis_vehicle_id ?? ''),
-        // Sometimes it's nested under "vehicle"
-        String(p.vehicle?.label ?? ''),
-        String(p.label ?? ''),
-      ];
+        p.vehicle_registration_number,
+        p.cis_vehicle_id,
+        p.label,
+        cis.vehicle_registration_number,
+        cis.vehicle_id,
+        trip.vehicle_registration_number,
+        trip.cis_vehicle_id,
+        p.vehicle?.registration_number,
+        p.vehicle?.label,
+      ].map(v => String(v ?? '').replace(/^0+/, ''));
 
-      return candidates.some(c => c === car || c.replace(/^0+/, '') === car.replace(/^0+/, ''));
+      const target = car.replace(/^0+/, '');
+      return candidates.some(c => c === target);
     });
 
     if (!match) {
-      log(`Car ${car} not found in ${features.length} active trams.`, 'warn');
+      log(`Car ${car} not found among ${features.length} active vehicles.`, 'warn');
       showPanel('notfound', car);
       setStatus(true, 'Live — car not found');
       return;
     }
 
-    // Extract data from matched feature
-    const p = match.properties || {};
-    const trip = p.trip || {};
-    const lastStop = p.last_stop || p.last_position || {};
+    const p        = match.properties || {};
+    const trip     = p.trip || {};
+    const lastStop = p.last_stop || {};
 
-    const lineNum   = trip.route_short_name || p.route_short_name || '?';
-    const headsign  = trip.headsign || trip.trip_headsign || p.headsign || '?';
-    const stopName  = lastStop.name || p.last_stop_departure?.stop?.name || '—';
-    const tracking  = p.is_canceled ? 'Cancelled' :
-                      p.is_wheelchair_accessible ? 'In service · Accessible' :
-                      'In service';
+    const lineNum  = trip.route_short_name || p.route_short_name || '?';
+    const headsign = trip.headsign || trip.trip_headsign || '?';
+    const stopName = lastStop.name || '—';
+    const status   = p.is_canceled ? 'Cancelled' : 'In service';
 
-    // Update UI
     document.getElementById('lineBadge').textContent = lineNum;
-    document.getElementById('lineBadge').className = 'line-badge';
-    document.getElementById('headsign').textContent = headsign;
-    document.getElementById('lastStop').textContent = stopName;
-    document.getElementById('tripStatus').textContent = tracking;
+    document.getElementById('headsign').textContent  = headsign;
+    document.getElementById('lastStop').textContent  = stopName;
+    document.getElementById('tripStatus').textContent = status;
 
     showPanel('vehicle');
     setStatus(true, 'Live');
-    log(`Car ${car} → Line ${lineNum} → ${headsign} | Last stop: ${stopName}`, 'ok');
+    log(`Car ${car} → Line ${lineNum} → ${headsign} | Last: ${stopName}`, 'ok');
   }
 
-  // ── Controls ─────────────────────────────────────────────────────────────
+  // ── CONTROLS ─────────────────────────────────────────────────────────────
   function startTracking() {
     stopTracking();
+    // Hide setup warning once user starts
+    document.getElementById('workerWarning').style.display = 'none';
     fetchVehicles();
     const secs = Math.max(10, parseInt(document.getElementById('intervalInput').value) || 20);
     trackInterval = setInterval(fetchVehicles, secs * 1000);
-    log(`Tracking started — refresh every ${secs}s.`, 'ok');
+    log(`Tracking started — refreshing every ${secs}s.`, 'ok');
   }
 
   function stopTracking() {
@@ -557,15 +474,6 @@
       log('Tracking stopped.');
     }
   }
-
-  // Pre-fill key if hardcoded
-  window.addEventListener('DOMContentLoaded', () => {
-    if (HARDCODED_API_KEY) {
-      log('Hardcoded API key detected — ready to track.', 'ok');
-    } else {
-      log('No API key found. Open "API Key" to set one.', 'warn');
-    }
-  });
 </script>
 
 </body>
