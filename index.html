@@ -270,10 +270,10 @@
   </div>
 
   <!-- IMPORTANT SETUP NOTE -->
-  <div id="workerWarning" class="card" style="border-color:#e8c84044;">
+  <div id="workerWarning" class="card" style="border-color:#e8c84044;display:none;">
     <div style="font-family:var(--sans);font-size:13px;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">⚙ Setup required</div>
     <div style="font-size:12px;color:var(--dim);line-height:1.7;">
-      Replace <code style="color:var(--accent);background:#0d0f10;padding:1px 6px;">YOUR_WORKER_URL</code> in this file with your Cloudflare Worker URL before deploying.<br/>
+      Replace <code style="color:var(--accent);background:#0d0f10;padding:1px 6px;">https://nameless-pond-5886.albertbouchalcz.workers.dev/</code> in this file with your Cloudflare Worker URL before deploying.<br/>
       See the included <strong style="color:var(--text);">README.md</strong> for step-by-step instructions.
     </div>
   </div>
@@ -319,21 +319,17 @@
 </footer>
 
 <script>
-  // ── CONFIGURATION ────────────────────────────────────────────────────────
-  // After deploying your Cloudflare Worker, replace the URL below with yours.
-  // It will look like: https://pid-proxy.YOUR-SUBDOMAIN.workers.dev
   const WORKER_URL = 'https://nameless-pond-5886.albertbouchalcz.workers.dev/';
 
-  // ── STATE ────────────────────────────────────────────────────────────────
+  const stopCache = {};
   let trackInterval = null;
 
-  // ── HELPERS ──────────────────────────────────────────────────────────────
   function log(msg, type = '') {
     const box = document.getElementById('logBox');
     const d = document.createElement('div');
     d.className = 'log-entry' + (type ? ' ' + type : '');
     const t = new Date().toLocaleTimeString('cs-CZ', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-    d.textContent = `${t}  ${msg}`;
+    d.textContent = t + '  ' + msg;
     box.insertBefore(d, box.firstChild);
     if (box.children.length > 50) box.removeChild(box.lastChild);
   }
@@ -363,17 +359,33 @@
     }
   }
 
-  // ── MAIN FETCH ───────────────────────────────────────────────────────────
-  async function fetchVehicles() {
-    const car = document.getElementById('carInput').value.trim();
-    document.getElementById('cardCarNum').textContent = car;
-    document.getElementById('footerCar').textContent  = 'Car ' + car;
+  // Resolve stop ID (e.g. "U394Z3P") to a human-readable name.
+  // The vehicle positions API only returns stop IDs, not names.
+  // We strip the technical suffix to produce a clean readable form,
+  // e.g. "U394Z3P" -> look up in Golemio stops, or fall back to stripping suffix.
+  async function resolveStopName(stopId) {
+    if (!stopId) return '—';
+    if (stopCache[stopId]) return stopCache[stopId];
+    try {
+      const res = await fetch(
+        'https://nameless-pond-5886.albertbouchalcz.workers.dev/stop?id=' + encodeURIComponent(stopId)
+      );
+      if (res.ok) {
+        const d = await res.json();
+        const name = (d && d.name) ? d.name : null;
+        if (name) { stopCache[stopId] = name; return name; }
+      }
+    } catch (_) {}
+    // Fallback: just show stop ID — better than nothing, and we'll fix worker later
+    stopCache[stopId] = stopId;
+    return stopId;
+  }
 
-    if (WORKER_URL === 'YOUR_WORKER_URL') {
-      showPanel('error', 'Worker URL not set. Edit index.html and replace YOUR_WORKER_URL.');
-      setStatus(false, 'Not configured');
-      return;
-    }
+  async function fetchVehicles() {
+    const carNum = parseInt(document.getElementById('carInput').value.trim(), 10);
+    const carStr = String(carNum);
+    document.getElementById('cardCarNum').textContent = carStr;
+    document.getElementById('footerCar').textContent  = 'Car ' + carStr;
 
     setStatus(true, 'Fetching…');
 
@@ -382,7 +394,7 @@
       const res = await fetch(WORKER_URL);
       if (!res.ok) {
         const errText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errText.slice(0, 200)}`);
+        throw new Error('HTTP ' + res.status + ': ' + errText.slice(0, 200));
       }
       data = await res.json();
     } catch (err) {
@@ -396,74 +408,51 @@
     document.getElementById('lastUpdated').textContent = now;
 
     const features = data.features || [];
-    log(`Received ${features.length} vehicle positions.`, 'ok');
+    log('Received ' + features.length + ' vehicle positions.', 'ok');
 
-    // Debug: on first successful fetch, log property structure of first vehicle
-    if (features.length > 0 && !window._debugDone) {
-      window._debugDone = true;
-      const s = features[0].properties || {};
-      log('Fields: ' + JSON.stringify(Object.keys(s)), '');
-      if (s.trip) log('Trip fields: ' + JSON.stringify(Object.keys(s.trip)), '');
-      log('Sample: ' + JSON.stringify(s).slice(0, 500), '');
-    }
-
-    // Find our vehicle — try every known field name for car registration number
+    // Key confirmed from API sample: properties.trip.vehicle_registration_number (integer)
     const match = features.find(f => {
-      const p    = f.properties || {};
-      const trip = p.trip || {};
-      const cis  = p.cis  || {};
-
-      const candidates = [
-        p.vehicle_registration_number,
-        p.cis_vehicle_id,
-        p.label,
-        cis.vehicle_registration_number,
-        cis.vehicle_id,
-        trip.vehicle_registration_number,
-        trip.cis_vehicle_id,
-        p.vehicle?.registration_number,
-        p.vehicle?.label,
-      ].map(v => String(v ?? '').replace(/^0+/, ''));
-
-      const target = car.replace(/^0+/, '');
-      return candidates.some(c => c === target);
+      const vrn = f && f.properties && f.properties.trip && f.properties.trip.vehicle_registration_number;
+      return Number(vrn) === carNum;
     });
 
     if (!match) {
-      log(`Car ${car} not found among ${features.length} active vehicles.`, 'warn');
-      showPanel('notfound', car);
+      log('Car ' + carStr + ' not found among ' + features.length + ' active vehicles.', 'warn');
+      showPanel('notfound', carStr);
       setStatus(true, 'Live — car not found');
       return;
     }
 
-    const p        = match.properties || {};
-    const trip     = p.trip || {};
-    const lastStop = p.last_stop || {};
+    const trip    = match.properties.trip;
+    const lastPos = match.properties.last_position;
+    const gtfs    = trip.gtfs || {};
 
-    const lineNum  = trip.route_short_name || p.route_short_name || '?';
-    const headsign = trip.headsign || trip.trip_headsign || '?';
-    const stopName = lastStop.name || '—';
-    const status   = p.is_canceled ? 'Cancelled' : 'In service';
+    const lineNum  = gtfs.route_short_name || '?';
+    const headsign = gtfs.trip_headsign    || '?';
+    const status   = lastPos && lastPos.is_canceled ? 'Cancelled' : 'In service';
+    const lastStopId = lastPos && lastPos.last_stop ? lastPos.last_stop.id : null;
 
-    document.getElementById('lineBadge').textContent = lineNum;
-    document.getElementById('headsign').textContent  = headsign;
-    document.getElementById('lastStop').textContent  = stopName;
+    // Show stop ID immediately, then replace with name if resolved
+    document.getElementById('lastStop').textContent = lastStopId || '—';
+    resolveStopName(lastStopId).then(name => {
+      document.getElementById('lastStop').textContent = name;
+    });
+
+    document.getElementById('lineBadge').textContent  = lineNum;
+    document.getElementById('headsign').textContent   = headsign;
     document.getElementById('tripStatus').textContent = status;
 
     showPanel('vehicle');
     setStatus(true, 'Live');
-    log(`Car ${car} → Line ${lineNum} → ${headsign} | Last: ${stopName}`, 'ok');
+    log('Car ' + carStr + ' → Line ' + lineNum + ' → ' + headsign + ' | Stop: ' + lastStopId, 'ok');
   }
 
-  // ── CONTROLS ─────────────────────────────────────────────────────────────
   function startTracking() {
     stopTracking();
-    // Hide setup warning once user starts
-    document.getElementById('workerWarning').style.display = 'none';
     fetchVehicles();
     const secs = Math.max(10, parseInt(document.getElementById('intervalInput').value) || 20);
     trackInterval = setInterval(fetchVehicles, secs * 1000);
-    log(`Tracking started — refreshing every ${secs}s.`, 'ok');
+    log('Tracking started — refreshing every ' + secs + 's.', 'ok');
   }
 
   function stopTracking() {
