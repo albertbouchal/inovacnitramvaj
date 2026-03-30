@@ -291,10 +291,6 @@
           <div class="detail-val accent" id="headsign">—</div>
         </div>
         <div class="detail-row">
-          <div class="detail-key">Timetable</div>
-          <div class="detail-val" id="timetableLink" style="font-size:15px;">—</div>
-        </div>
-        <div class="detail-row">
           <div class="detail-key">Last stop</div>
           <div class="detail-val" id="lastStop">—</div>
         </div>
@@ -453,12 +449,6 @@
     document.getElementById('headsign').textContent  = headsign;
     document.getElementById('lastStop').textContent  = stopName;
     document.getElementById('tripStatus').textContent = status;
-
-    const timetableUrl = 'https://pid.cz/zastavkove-jizdni-rady/?cid=' + lineNum + '&type=tram';
-    document.getElementById('timetableLink').innerHTML =
-      '<a href="' + timetableUrl + '" target="_blank" rel="noopener" ' +
-      'style="color:var(--accent);text-decoration:none;border-bottom:1px solid var(--muted);padding-bottom:1px;">' +
-      'pid.cz ↗ Line ' + lineNum + '</a>';
 
     showPanel('vehicle');
     setStatus(true, 'Live');
