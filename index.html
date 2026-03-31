@@ -67,6 +67,7 @@
       animation: blink 2s infinite;
     }
     .pulse.offline { background: var(--red); animation: none; }
+    .pulse.searching { background: var(--accent); }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
     main {
@@ -78,13 +79,14 @@
       max-width: 760px;
     }
 
-    .config {
+    /* ── Controls ── */
+    .controls {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
-    label {
+    label.field-label {
       font-size: 11px;
       color: var(--dim);
       text-transform: uppercase;
@@ -103,28 +105,96 @@
     }
     input:focus { border-color: var(--accent); }
 
-    .btn {
+    /* Primary button — glowing yellow */
+    .btn-primary {
       background: var(--accent);
       color: #0d0f10;
       border: none;
       font-family: var(--sans);
       font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 0.1em;
+      font-size: 14px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      padding: 9px 18px;
+      padding: 10px 22px;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: box-shadow 0.2s, opacity 0.15s;
+      box-shadow: 0 0 12px 2px rgba(232,200,64,0.35);
     }
-    .btn:hover { opacity: 0.85; }
-    .btn.secondary {
+    .btn-primary:hover { box-shadow: 0 0 20px 4px rgba(232,200,64,0.55); }
+    .btn-primary:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
+
+    /* Secondary button — quiet outline */
+    .btn-secondary {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--dim);
+      font-family: var(--sans);
       font-weight: 400;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 9px 18px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
     }
-    .btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-secondary:disabled { opacity: 0.35; cursor: default; }
 
+    /* Monitor toggle */
+    .monitor-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 4px;
+    }
+    .monitor-label {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+    }
+    /* custom toggle switch */
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .toggle input { display: none; }
+    .toggle-track {
+      width: 36px;
+      height: 20px;
+      background: var(--muted);
+      border-radius: 10px;
+      transition: background 0.2s;
+      position: absolute;
+      top: 0; left: 0;
+    }
+    .toggle input:checked + .toggle-track { background: var(--accent); }
+    .toggle-thumb {
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px; left: 3px;
+      transition: left 0.2s;
+      pointer-events: none;
+    }
+    .toggle input:checked ~ .toggle-thumb { left: 19px; }
+
+    .interval-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+    .interval-wrap.hidden { opacity: 0.3; pointer-events: none; }
+
+    /* ── Card ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -142,17 +212,9 @@
       align-items: center;
       gap: 8px;
     }
-    .card-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
+    .card-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-    .vehicle-status {
-      display: grid;
-      grid-template-columns: auto 1fr;
-    }
+    .vehicle-status { display: grid; grid-template-columns: auto 1fr; }
     .line-badge {
       font-family: var(--sans);
       font-weight: 700;
@@ -167,36 +229,16 @@
       min-width: 120px;
       justify-content: center;
     }
-    .vehicle-details {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      justify-content: center;
-    }
+    .vehicle-details { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
     .detail-row { display: flex; flex-direction: column; gap: 2px; }
-    .detail-key {
-      font-size: 10px;
-      color: var(--dim);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .detail-val {
-      font-family: var(--sans);
-      font-size: 22px;
-      font-weight: 500;
-      color: var(--text);
-      letter-spacing: 0.02em;
-    }
+    .detail-key { font-size: 10px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
+    .detail-val { font-family: var(--sans); font-size: 22px; font-weight: 500; color: var(--text); letter-spacing: 0.02em; }
     .detail-val.accent { color: var(--accent); }
     .detail-val.muted  { color: var(--muted); font-size: 16px; }
+    .detail-val a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--muted); padding-bottom: 1px; }
+    .detail-val a:hover { border-color: var(--accent); }
 
-    .state-msg {
-      padding: 32px 0;
-      text-align: center;
-      color: var(--dim);
-      font-size: 13px;
-      letter-spacing: 0.06em;
-    }
+    .state-msg { padding: 32px 0; text-align: center; color: var(--dim); font-size: 13px; letter-spacing: 0.06em; }
     .state-msg.error { color: var(--red); }
 
     .log {
@@ -205,7 +247,7 @@
       border-top: 1px solid var(--border);
       margin-top: 20px;
       padding-top: 14px;
-      max-height: 140px;
+      max-height: 130px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -230,16 +272,16 @@
     footer a { color: var(--dim); text-decoration: none; }
     footer a:hover { color: var(--accent); }
 
-    @media (max-width: 520px) {
+    @media (max-width: 540px) {
       .vehicle-status { grid-template-columns: 1fr; }
       .line-badge {
         font-size: 48px;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
+        border-right: none; border-bottom: 1px solid var(--border);
         padding-right: 0; padding-bottom: 16px;
         margin-right: 0; margin-bottom: 16px;
         min-width: unset;
       }
+      .controls { gap: 8px; }
     }
   </style>
 </head>
@@ -258,30 +300,33 @@
 
 <main>
 
-  <div class="config">
-    <label for="carInput">Car №</label>
+  <div class="controls">
+    <label class="field-label" for="carInput">Car №</label>
     <input type="text" id="carInput" value="9277" maxlength="6" />
 
-    <label for="intervalInput" style="margin-left:8px;">Refresh (s)</label>
-    <input type="number" id="intervalInput" value="20" min="10" max="120" style="width:72px;" />
+    <button class="btn-primary" id="checkBtn" onclick="checkOnce()">Check</button>
 
-    <button class="btn" onclick="startTracking()">Track</button>
-    <button class="btn secondary" onclick="stopTracking()">Stop</button>
-  </div>
+    <div class="monitor-wrap">
+      <label class="toggle" for="monitorToggle" title="Continuous monitoring">
+        <input type="checkbox" id="monitorToggle" onchange="toggleMonitor()" />
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+      <label class="monitor-label" for="monitorToggle">Monitor</label>
+    </div>
 
-  <!-- IMPORTANT SETUP NOTE -->
-  <div id="workerWarning" class="card" style="border-color:#e8c84044;display:none;">
-    <div style="font-family:var(--sans);font-size:13px;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">⚙ Setup required</div>
-    <div style="font-size:12px;color:var(--dim);line-height:1.7;">
-      Replace <code style="color:var(--accent);background:#0d0f10;padding:1px 6px;">https://nameless-pond-5886.albertbouchalcz.workers.dev/</code> in this file with your Cloudflare Worker URL before deploying.<br/>
-      See the included <strong style="color:var(--text);">README.md</strong> for step-by-step instructions.
+    <div class="interval-wrap" id="intervalWrap">
+      <label class="field-label" for="intervalInput">every</label>
+      <input type="number" id="intervalInput" value="30" min="15" max="300" style="width:64px;" />
+      <label class="field-label">s</label>
     </div>
   </div>
 
   <div class="card">
     <div class="card-label">Vehicle Status — Car <span id="cardCarNum">9277</span></div>
 
-    <div class="state-msg" id="idleMsg">Press <strong style="color:var(--accent)">Track</strong> to start monitoring.</div>
+    <div class="state-msg" id="idleMsg">Press <strong style="color:var(--accent)">Check</strong> to look up the car.</div>
+    <div class="state-msg" id="searchingMsg" style="display:none;">Searching all active trams…</div>
 
     <div class="vehicle-status" id="vehicleInfo" style="display:none;">
       <div class="line-badge" id="lineBadge">—</div>
@@ -298,14 +343,18 @@
           <div class="detail-key">Status</div>
           <div class="detail-val muted" id="tripStatus">—</div>
         </div>
+        <div class="detail-row">
+          <div class="detail-key">Timetable</div>
+          <div class="detail-val" id="timetableLink" style="font-size:16px;">—</div>
+        </div>
       </div>
     </div>
 
     <div class="state-msg error" id="errorMsg" style="display:none;"></div>
 
     <div class="state-msg" id="notFoundMsg" style="display:none;">
-      Car <strong id="notFoundNum" style="color:var(--accent);"></strong> not found in active feed —
-      possibly in depot or off service right now.
+      Car <strong id="notFoundNum" style="color:var(--accent);"></strong> not found —
+      possibly in depot or off service.
     </div>
 
     <div class="log" id="logBox"></div>
@@ -319,150 +368,188 @@
 </footer>
 
 <script>
-  const WORKER_URL = 'https://nameless-pond-5886.albertbouchalcz.workers.dev/';
+  const WORKER = 'https://nameless-pond-5886.albertbouchalcz.workers.dev';
 
-  const stopCache = {};
-  let trackInterval = null;
+  // State
+  let monitorInterval = null;
+  let cachedTripId    = null; // once found, poll this specific trip
+  let lastCarNum      = null;
+  const stopCache     = {};
 
+  // ── UI helpers ────────────────────────────────────────────────────────────
   function log(msg, type = '') {
     const box = document.getElementById('logBox');
-    const d = document.createElement('div');
+    const d   = document.createElement('div');
     d.className = 'log-entry' + (type ? ' ' + type : '');
     const t = new Date().toLocaleTimeString('cs-CZ', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
     d.textContent = t + '  ' + msg;
     box.insertBefore(d, box.firstChild);
-    if (box.children.length > 50) box.removeChild(box.lastChild);
+    if (box.children.length > 60) box.removeChild(box.lastChild);
   }
 
-  function setStatus(online, text) {
-    document.getElementById('statusDot').className = 'pulse' + (online ? '' : ' offline');
+  function setStatus(state, text) {
+    const dot = document.getElementById('statusDot');
+    dot.className = 'pulse ' + state; // 'offline' | 'searching' | ''
     document.getElementById('statusText').textContent = text;
   }
 
   function showPanel(which, extra) {
-    document.getElementById('idleMsg').style.display     = 'none';
-    document.getElementById('vehicleInfo').style.display = 'none';
-    document.getElementById('errorMsg').style.display    = 'none';
-    document.getElementById('notFoundMsg').style.display = 'none';
-
-    if (which === 'vehicle') {
-      document.getElementById('vehicleInfo').style.display = 'grid';
-    } else if (which === 'error') {
-      const el = document.getElementById('errorMsg');
-      el.style.display = '';
-      el.textContent = extra || 'Unknown error.';
-    } else if (which === 'notfound') {
-      document.getElementById('notFoundMsg').style.display = '';
-      document.getElementById('notFoundNum').textContent = extra;
-    } else {
-      document.getElementById('idleMsg').style.display = '';
-    }
+    ['idleMsg','searchingMsg','vehicleInfo','errorMsg','notFoundMsg'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+    if (which === 'vehicle')    { document.getElementById('vehicleInfo').style.display = 'grid'; }
+    else if (which === 'error') { const e = document.getElementById('errorMsg'); e.style.display = ''; e.textContent = extra; }
+    else if (which === 'notfound') { document.getElementById('notFoundMsg').style.display = ''; document.getElementById('notFoundNum').textContent = extra; }
+    else if (which === 'searching') { document.getElementById('searchingMsg').style.display = ''; }
+    else { document.getElementById('idleMsg').style.display = ''; }
   }
 
-  // Resolve stop ID (e.g. "U394Z3P") to a human-readable name.
-  // The vehicle positions API only returns stop IDs, not names.
-  // We strip the technical suffix to produce a clean readable form,
-  // e.g. "U394Z3P" -> look up in Golemio stops, or fall back to stripping suffix.
   async function resolveStopName(stopId) {
     if (!stopId) return '—';
     if (stopCache[stopId]) return stopCache[stopId];
     try {
-      const res = await fetch(
-        'https://nameless-pond-5886.albertbouchalcz.workers.dev/stop?id=' + encodeURIComponent(stopId)
-      );
+      const res = await fetch(WORKER + '/stop?id=' + encodeURIComponent(stopId));
       if (res.ok) {
         const d = await res.json();
-        const name = (d && d.name) ? d.name : null;
-        if (name) { stopCache[stopId] = name; return name; }
+        if (d.name) { stopCache[stopId] = d.name; return d.name; }
       }
     } catch (_) {}
-    // Fallback: just show stop ID — better than nothing, and we'll fix worker later
     stopCache[stopId] = stopId;
     return stopId;
   }
 
-  async function fetchVehicles() {
-    const carNum = parseInt(document.getElementById('carInput').value.trim(), 10);
-    const carStr = String(carNum);
-    document.getElementById('cardCarNum').textContent = carStr;
-    document.getElementById('footerCar').textContent  = 'Car ' + carStr;
+  function renderVehicle(data, carStr) {
+    const timetableUrl = 'https://pid.cz/zastavkove-jizdni-rady/?cid=' + data.line + '&type=tram';
+    document.getElementById('lineBadge').textContent   = data.line;
+    document.getElementById('headsign').textContent    = data.headsign;
+    document.getElementById('tripStatus').textContent  = data.canceled ? 'Cancelled' : 'In service';
+    document.getElementById('timetableLink').innerHTML =
+      '<a href="' + timetableUrl + '" target="_blank" rel="noopener">pid.cz ↗ Line ' + data.line + '</a>';
+    document.getElementById('lastStop').textContent    = data.last_stop || '—';
 
-    setStatus(true, 'Fetching…');
+    // Resolve stop name asynchronously
+    resolveStopName(data.last_stop).then(name => {
+      document.getElementById('lastStop').textContent = name;
+    });
+
+    showPanel('vehicle');
+    setStatus('', 'Live');
+    const now = new Date().toLocaleTimeString('cs-CZ', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    document.getElementById('lastUpdated').textContent = now;
+    log('Car ' + carStr + ' → Line ' + data.line + ' → ' + data.headsign + ' | trip: ' + data.trip_id, 'ok');
+  }
+
+  // ── Phase 1: find the car (paginated search, done by worker) ─────────────
+  async function findCar(carNum, carStr) {
+    setStatus('searching', 'Searching…');
+    showPanel('searching');
+    log('Searching all active trams for car ' + carStr + '…');
 
     let data;
     try {
-      const res = await fetch(WORKER_URL);
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error('HTTP ' + res.status + ': ' + errText.slice(0, 200));
-      }
+      const res = await fetch(WORKER + '/find/' + carNum);
+      if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + await res.text());
       data = await res.json();
     } catch (err) {
-      log('Fetch error: ' + err.message, 'err');
+      log('Error: ' + err.message, 'err');
       showPanel('error', 'Fetch failed: ' + err.message);
-      setStatus(false, 'Error');
+      setStatus('offline', 'Error');
+      return false;
+    }
+
+    if (!data.found) {
+      log('Car ' + carStr + ' not found in active tram fleet.', 'warn');
+      showPanel('notfound', carStr);
+      setStatus('offline', 'Not found');
+      cachedTripId = null;
+      return false;
+    }
+
+    cachedTripId = data.trip_id;
+    log('Found! trip_id locked: ' + cachedTripId, 'ok');
+    renderVehicle(data, carStr);
+    return true;
+  }
+
+  // ── Phase 2: poll the cached trip_id (1 request) ─────────────────────────
+  async function pollTrip(carStr) {
+    if (!cachedTripId) return findCar(parseInt(carStr, 10), carStr);
+
+    let data;
+    try {
+      const res = await fetch(WORKER + '/track/' + encodeURIComponent(cachedTripId));
+      if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + await res.text());
+      data = await res.json();
+    } catch (err) {
+      log('Poll error: ' + err.message, 'err');
+      setStatus('offline', 'Error');
+      return;
+    }
+
+    if (!data.found) {
+      // Trip ended (end of shift, returned to depot) — re-search
+      log('Trip ' + cachedTripId + ' ended. Re-searching…', 'warn');
+      cachedTripId = null;
+      await findCar(parseInt(carStr, 10), carStr);
       return;
     }
 
     const now = new Date().toLocaleTimeString('cs-CZ', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
     document.getElementById('lastUpdated').textContent = now;
+    renderVehicle(data, carStr);
+  }
 
-    const features = data.features || [];
-    log('Received ' + features.length + ' vehicle positions.', 'ok');
+  // ── Controls ──────────────────────────────────────────────────────────────
+  async function checkOnce() {
+    const carStr = document.getElementById('carInput').value.trim();
+    const carNum = parseInt(carStr, 10);
+    if (!carStr || isNaN(carNum)) return;
 
-    // Key confirmed from API sample: properties.trip.vehicle_registration_number (integer)
-    const match = features.find(f => {
-      const vrn = f && f.properties && f.properties.trip && f.properties.trip.vehicle_registration_number;
-      return Number(vrn) === carNum;
-    });
+    document.getElementById('cardCarNum').textContent = carStr;
+    document.getElementById('footerCar').textContent  = 'Car ' + carStr;
 
-    if (!match) {
-      log('Car ' + carStr + ' not found among ' + features.length + ' active vehicles.', 'warn');
-      showPanel('notfound', carStr);
-      setStatus(true, 'Live — car not found');
-      return;
+    // If car changed, forget cached trip
+    if (carStr !== lastCarNum) {
+      cachedTripId = null;
+      lastCarNum   = carStr;
     }
 
-    const trip    = match.properties.trip;
-    const lastPos = match.properties.last_position;
-    const gtfs    = trip.gtfs || {};
-
-    const lineNum  = gtfs.route_short_name || '?';
-    const headsign = gtfs.trip_headsign    || '?';
-    const status   = lastPos && lastPos.is_canceled ? 'Cancelled' : 'In service';
-    const lastStopId = lastPos && lastPos.last_stop ? lastPos.last_stop.id : null;
-
-    // Show stop ID immediately, then replace with name if resolved
-    document.getElementById('lastStop').textContent = lastStopId || '—';
-    resolveStopName(lastStopId).then(name => {
-      document.getElementById('lastStop').textContent = name;
-    });
-
-    document.getElementById('lineBadge').textContent  = lineNum;
-    document.getElementById('headsign').textContent   = headsign;
-    document.getElementById('tripStatus').textContent = status;
-
-    showPanel('vehicle');
-    setStatus(true, 'Live');
-    log('Car ' + carStr + ' → Line ' + lineNum + ' → ' + headsign + ' | Stop: ' + lastStopId, 'ok');
+    document.getElementById('checkBtn').disabled = true;
+    await pollTrip(carStr);
+    document.getElementById('checkBtn').disabled = false;
   }
 
-  function startTracking() {
-    stopTracking();
-    fetchVehicles();
-    const secs = Math.max(10, parseInt(document.getElementById('intervalInput').value) || 20);
-    trackInterval = setInterval(fetchVehicles, secs * 1000);
-    log('Tracking started — refreshing every ' + secs + 's.', 'ok');
-  }
+  function toggleMonitor() {
+    const on  = document.getElementById('monitorToggle').checked;
+    const iw  = document.getElementById('intervalWrap');
+    iw.classList.toggle('hidden', !on);
 
-  function stopTracking() {
-    if (trackInterval) {
-      clearInterval(trackInterval);
-      trackInterval = null;
-      setStatus(false, 'Stopped');
-      log('Tracking stopped.');
+    if (on) {
+      const secs = Math.max(15, parseInt(document.getElementById('intervalInput').value) || 30);
+      log('Monitor ON — refreshing every ' + secs + 's.', 'ok');
+      // Don't fire immediately — checkOnce() was just called (or user will call it)
+      monitorInterval = setInterval(() => {
+        const carStr = document.getElementById('carInput').value.trim();
+        document.getElementById('cardCarNum').textContent = carStr;
+        document.getElementById('footerCar').textContent  = 'Car ' + carStr;
+        pollTrip(carStr);
+      }, secs * 1000);
+    } else {
+      if (monitorInterval) { clearInterval(monitorInterval); monitorInterval = null; }
+      setStatus(cachedTripId ? '' : 'offline', cachedTripId ? 'Live (paused)' : 'Stopped');
+      log('Monitor OFF.');
     }
   }
+
+  // Reset monitor if interval changes
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('intervalInput').addEventListener('change', () => {
+      if (document.getElementById('monitorToggle').checked) {
+        document.getElementById('monitorToggle').checked = false;
+        toggleMonitor();
+      }
+    });
+  });
 </script>
 
 </body>
