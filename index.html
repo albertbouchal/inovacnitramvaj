@@ -343,10 +343,7 @@
           <div class="detail-key">Status</div>
           <div class="detail-val muted" id="tripStatus">—</div>
         </div>
-        <div class="detail-row">
-          <div class="detail-key">Timetable</div>
-          <div class="detail-val" id="timetableLink" style="font-size:16px;">—</div>
-        </div>
+
       </div>
     </div>
 
@@ -419,12 +416,9 @@
   }
 
   function renderVehicle(data, carStr) {
-    const timetableUrl = 'https://pid.cz/zastavkove-jizdni-rady/?cid=' + data.line + '&type=tram';
     document.getElementById('lineBadge').textContent   = data.line;
     document.getElementById('headsign').textContent    = data.headsign;
     document.getElementById('tripStatus').textContent  = data.canceled ? 'Cancelled' : 'In service';
-    document.getElementById('timetableLink').innerHTML =
-      '<a href="' + timetableUrl + '" target="_blank" rel="noopener">pid.cz ↗ Line ' + data.line + '</a>';
     document.getElementById('lastStop').textContent    = data.last_stop || '—';
 
     // Resolve stop name asynchronously
