@@ -343,6 +343,10 @@
           <div class="detail-key">Status</div>
           <div class="detail-val muted" id="tripStatus">—</div>
         </div>
+        <div class="detail-row">
+          <div class="detail-key">Dispatch</div>
+          <div class="detail-val" id="dispatchLink" style="font-size:16px;">—</div>
+        </div>
 
       </div>
     </div>
@@ -420,6 +424,9 @@
     document.getElementById('headsign').textContent    = data.headsign;
     document.getElementById('tripStatus').textContent  = data.canceled ? 'Cancelled' : 'In service';
     document.getElementById('lastStop').textContent    = data.last_stop || '—';
+    document.getElementById('dispatchLink').innerHTML  =
+      '<a href="https://tram.mobilnitabla.cz/vuz/' + carStr + '" target="_blank" rel="noopener">' +
+      'mobilnitabla.cz ↗ Car ' + carStr + '</a>';
 
     // Resolve stop name asynchronously
     resolveStopName(data.last_stop).then(name => {
